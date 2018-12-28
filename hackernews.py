@@ -61,16 +61,12 @@ def get_hacker_news(intent, session):
     session_attributes = {}
     reprompt_text = None
 
-    print("THIS IS WORKING before getting contents")
     html_doc = requests.get("https://news.ycombinator.com")
-    __import__('pdb').set_trace()
-    soup = BeautifulSoup(html_doc.content, 'html.parser')
-
-    print("THIS IS WORKING after getting contents")
+    soup = BeautifulSoup(html_doc.content[:20000], 'html5lib')
+    # limitation with bs4 library?
 
     items = soup.findAll("a", {"class": "storylink"})
-    # speech_output = str(items[10].contents[0])
-    speech_output = "Here are your results Filcho"
+    speech_output = str(items[10].contents[0])
 
     should_end_session = True
 
@@ -89,10 +85,7 @@ def on_intent(intent_request, session):
 
     # Dispatch to your skill's intent handlers
     if intent_name == "HackerNewsIntent":
-        print("INTENT NAME IS", intent["name"])
-        # return get_hacker_news(intent, session)
         data = get_hacker_news(intent, session)
-        print("DATA IS", data)
         return data
     elif intent_name == "AMAZON.HelpIntent":
         return get_welcome_response()
