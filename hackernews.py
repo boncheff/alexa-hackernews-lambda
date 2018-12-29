@@ -9,7 +9,6 @@ http://amzn.to/1LGWsLG
 
 from __future__ import print_function
 import requests
-from bs4 import BeautifulSoup
 
 
 def lambda_handler(event, context):
@@ -61,12 +60,10 @@ def get_hacker_news(intent, session):
     session_attributes = {}
     reprompt_text = None
 
-    html_doc = requests.get("https://news.ycombinator.com")
-    soup = BeautifulSoup(html_doc.content[:20000], 'html5lib')
-    # limitation with bs4 library?
-
-    items = soup.findAll("a", {"class": "storylink"})
-    speech_output = str(items[10].contents[0])
+    base_url = "https://hacker-news.firebaseio.com/v0/item/{}.json"
+    top_stories = requests.get("https://hacker-news.firebaseio.com/v0/topstories.json").json()
+    story = requests.get(base_url.format(top_stories[0])).json()
+    speech_output = story["title"]
 
     should_end_session = True
 
